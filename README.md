@@ -5,3 +5,6 @@
 ##### Timeline
 
 - [x] Assignment 0 Assignment 0. Welcome to CS106B!
+- [x] Section 1. C++ fundamentals
+- [ ] Assignment 1. Getting Your C++ Legs
+
