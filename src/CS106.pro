@@ -1,6 +1,5 @@
 TEMPLATE = subdirs
-SUBDIRS = Library Welcome \
-    starter-assign0/NameHash.pro
+SUBDIRS = Library
 
 
 # ordered forces subprojects to build sequentially, according to SUBDIRS

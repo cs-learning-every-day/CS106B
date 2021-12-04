@@ -3,12 +3,15 @@
  * TODO: Edit these comments to tell us what the repeating sequence is.
  */
 #include "StackOverflow.h"
+using namespace std;
 
 /* The "Goto Table" for the Stack Overflow example. This is essentially a function
  * that given a number between 0 and 1023 gives back a number between 0 and 1023.
  * Our function uses this table to make it hard to predict what's going to happen
  * next. Use the debugger to find out!
  */
+
+
 static constexpr int kGotoTable[] = {
     456,  841,  205,  326,  999,  935,   16,  497,  825,  218,  719,  204,  722,  792,  889,  779,  195, 1008,  776,  834,  587,  652,  498,  973,  428,  676,  876,  148,  126,  374,  190,   76,
     530,  994,  898,  806,   75,  865,   30,  863,   36,  167,    7,  414,  496,  391,  103,  111,  679,   35,  953,   65, 1013,   45,  263,  736,  760,  648,  983,   78,  626,   83,  571,  595,
@@ -52,6 +55,8 @@ static constexpr int kGotoTable[] = {
  * a certain sequence over and over and over again. Your job is to use the debugger,
  * the stack trace, and the variables window to figure out what the numbers in
  * the sequence are.
+ * 137->   164->685->203->327->549
+ *
  */
 void triggerStackOverflow(int index) {
     triggerStackOverflow(kGotoTable[index]);
