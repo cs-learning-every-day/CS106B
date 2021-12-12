@@ -5,7 +5,8 @@
  * TODO: Edit these comments to leave a puzzle for your section leader to solve!
  */
 #include "OnlyConnect.h"
-#include "GUI/SimpleTest.h"
+#include "Testing/OnlyConnectTests.h"
+
 using namespace std;
 
 string onlyConnectize(string phrase) {
@@ -17,28 +18,27 @@ string onlyConnectize(string phrase) {
 }
 
 
+/* * * * * * Test Cases * * * * * */
 
-
-
-
-/* * * * * * Provided Test Cases * * * * * */
-
-PROVIDED_TEST("Converts lower-case to upper-case.") {
+ADD_TEST("Converts lower-case to upper-case.") {
     EXPECT_EQUAL(onlyConnectize("lowercase"), "LWRCS");
     EXPECT_EQUAL(onlyConnectize("uppercase"), "PPRCS");
 }
 
-PROVIDED_TEST("Handles non-letter characters properly.") {
+ADD_TEST("Handles non-letter characters properly.") {
     EXPECT_EQUAL(onlyConnectize("2.718281828459045"), "");
     EXPECT_EQUAL(onlyConnectize("'Hi, Mom!'"), "HMM");
 }
 
-PROVIDED_TEST("Handles single-character inputs.") {
+ADD_TEST("Handles single-character inputs.") {
     EXPECT_EQUAL(onlyConnectize("A"), "");
     EXPECT_EQUAL(onlyConnectize("+"), "");
     EXPECT_EQUAL(onlyConnectize("Q"), "Q");
 }
-
+ADD_TEST("my own extreme test.") {
+    EXPECT_EQUAL(onlyConnectize(""), "");
+    EXPECT_EQUAL(onlyConnectize("989237482789748278478787482974cnhw iowhuhds*&*^&*%^&%^"), "CNHWWHHDS");
+}
 /* TODO: You will need to add your own tests into this suite of test cases. Think about the sorts
  * of inputs we tested here, and, importantly, what sorts of inputs we *didn't* test here. Some
  * general rules of testing:

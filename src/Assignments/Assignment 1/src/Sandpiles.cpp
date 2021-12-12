@@ -3,7 +3,7 @@
  * TODO: Edit these comments to describe anything interesting or noteworthy in your implementation.
  */
 #include "Sandpiles.h"
-#include "GUI/SimpleTest.h"
+#include "Testing/SandpileTests.h"
 using namespace std;
 
 void dropSandOn(Grid<int>& world, int row, int col) {
@@ -17,10 +17,9 @@ void dropSandOn(Grid<int>& world, int row, int col) {
 
 
 
+/* * * * * * Tests Below This Point * * * * * */
 
-/* * * * * * Provided Test Cases * * * * * */
-
-PROVIDED_TEST("Dropping into an empty cell only changes that cell.") {
+ADD_TEST("Dropping into an empty cell only changes that cell.") {
     /* Create a simple source grid. */
     Grid<int> before = {
         { 3, 3, 3 },
@@ -37,7 +36,7 @@ PROVIDED_TEST("Dropping into an empty cell only changes that cell.") {
     EXPECT_EQUAL(before, after); // The above call changes 'before.'
 }
 
-PROVIDED_TEST("Non-chaining topples work.") {
+ADD_TEST("Non-chaining topples work.") {
     /* Create a simple source grid. */
     Grid<int> before = {
         { 0, 0, 0 },
@@ -54,7 +53,7 @@ PROVIDED_TEST("Non-chaining topples work.") {
     EXPECT_EQUAL(before, after); // The above call changes 'before.'
 }
 
-PROVIDED_TEST("Two topples chain.") {
+ADD_TEST("Two topples chain.") {
     /* Create a simple source grid. */
     Grid<int> before = {
         { 0, 0, 0, 0 },
@@ -85,13 +84,3 @@ PROVIDED_TEST("Two topples chain.") {
  *
  * Happy testing!
  */
-
-
-
-
-
-
-
-
-
-
