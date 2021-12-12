@@ -1,7 +1,7 @@
-#include "ProblemHandler.h"
-#include "Plotter.h"
-#include "TemporaryComponent.h"
-#include "GUIUtils.h"
+#include "../Plotter.h"
+#include "../GUI/ProblemHandler.h"
+#include "../GUI/TemporaryComponent.h"
+#include "../GUI/GUIUtils.h"
 #include "gobjects.h"
 #include "error.h"
 #include "filelib.h"
@@ -38,16 +38,30 @@ namespace {
 
         void addLine(double x0, double y0, double x1, double y1, PenStyle style);
         void actionPerformed(GObservable* obj) override;
+        void windowResized() override;
 
     protected:
-        void repaint(GWindow& window) override;
+        void repaint() override;
 
     private:
         /* Geometry. */
         double baseX, baseY, scale;
 
         /* Lines to plot. */
-        vector<unique_ptr<GLine>> lines;
+        struct Line {
+            double x0, y0, x1, y1;
+            PenStyle style;
+        };
+
+        /* Raw lines in abstract space. */
+        vector<Line> rawLines;
+
+        /* Lines to draw on the screen. This list may be shorter than rawLines
+         * in the event that a line has been added that hasn't been drawn yet,
+         * or if the window is resized. Make sure to sync the size of rawLines
+         * and the size of displayLines before drawing!
+         */
+        vector<unique_ptr<GLine>> displayLines;
 
         /* Two-row grid of items. The layout looks like this
          *
@@ -64,17 +78,20 @@ namespace {
         GLabel*     statusLine;
 
         /* Initialization helpers. */
-        void calculateGeometry(GWindow& window);
-        void setUpChrome(GWindow& window);
+        void calculateGeometry();
+        void setUpChrome();
 
         /* Resets graphics state. */
         void clearGraphics();
+
+        /* Syncs the displayLines list with rawLines. */
+        void createGraphicsLines();
     };
 
     /* Returns all plotter files found in the example directory. */
     vector<string> sampleProblems() {
         vector<string> result;
-        for (const auto& file: listDirectory(".")) {
+        for (const auto& file: listDirectory("res/")) {
             if (endsWith(file, kFileSuffix)) {
                 result.push_back(file);
             }
@@ -86,12 +103,12 @@ namespace {
     PlotterGUI* theGUI = nullptr;
 
     /* Constructor sets up graphics and hooks us in as the One True GUI. */
-    PlotterGUI::PlotterGUI(GWindow& window) {
+    PlotterGUI::PlotterGUI(GWindow& window) : ProblemHandler(window) {
         if (theGUI) error("Why are there two copies of us?");
         theGUI = this;
 
-        setUpChrome(window);
-        calculateGeometry(window);
+        setUpChrome();
+        calculateGeometry();
     }
 
     PlotterGUI::~PlotterGUI() {
@@ -100,21 +117,15 @@ namespace {
 
     /* Hook from the global graphics system to drawing a line. */
     void PlotterGUI::addLine(double x0, double y0, double x1, double y1, PenStyle style) {
-        /* TODO: Once C++14 support is everywhere, use make_unique. */
-        unique_ptr<GLine> line(new GLine(x0 * scale + baseX, -y0 * scale + baseY,
-                                         x1 * scale + baseX, -y1 * scale + baseY));
-        line->setColor(style.color);
-        line->setLineWidth(style.width);
-        lines.push_back(move(line));
-
+        rawLines.push_back({x0, y0, x1, y1, style});
         requestRepaint();
     }
 
     /* Calculates window geometry information - scale, base X, base Y, etc. */
-    void PlotterGUI::calculateGeometry(GWindow& window) {
+    void PlotterGUI::calculateGeometry() {
         /* Computing the scaling factors needed to scale to the window width and window height. */
-        double width  = window.getCanvasWidth()  - 2 * kPadding;
-        double height = window.getCanvasHeight() - 2 * kPadding;
+        double width  = window().getCanvasWidth()  - 2 * kPadding;
+        double height = window().getCanvasHeight() - 2 * kPadding;
 
         scale = min(width, height) / 2.0;
 
@@ -124,7 +135,7 @@ namespace {
     }
 
     /* Sets up window controls ("chrome"). */
-    void PlotterGUI::setUpChrome(GWindow& window) {
+    void PlotterGUI::setUpChrome() {
         auto* rawContainer = new GContainer(GContainer::LAYOUT_GRID);
 
         fileChooser = new GComboBox();
@@ -141,25 +152,40 @@ namespace {
         rawContainer->addToGrid(loadButton,  0, 1);
         rawContainer->addToGrid(statusLine,  1, 0, 1, 2);
 
-        container = Temporary<GContainer>(rawContainer, window, "SOUTH");
+        container = Temporary<GContainer>(rawContainer, window(), "SOUTH");
     }
 
-    void PlotterGUI::repaint(GWindow& window) {
+    void PlotterGUI::repaint() {
         /* We have to draw the border on top of the lines in case the plotter
          * goes out of bounds!
          */
-        clearDisplay(window, kCanvasColor);
+        clearDisplay(window(), kCanvasColor);
+        createGraphicsLines();
 
-        for (const auto& line: lines) {
-            window.draw(*line);
+        for (const auto& line: displayLines) {
+            window().draw(*line);
         }
 
         /* Draw above, to the left of, to the right of, and below the canvas. */
-        window.setColor(kWindowColor);
-        window.fillRect(0, 0, baseX - scale, window.getHeight()); // Left
-        window.fillRect(baseX + scale, 0, window.getWidth() - baseX - scale, window.getHeight()); // Right
-        window.fillRect(0, 0, window.getWidth(), baseY - scale);
-        window.fillRect(0, baseY + scale, window.getWidth(), window.getHeight() - baseY - scale);
+        window().setColor(kWindowColor);
+        window().fillRect(0, 0, baseX - scale, window().getHeight()); // Left
+        window().fillRect(baseX + scale, 0, window().getWidth() - baseX - scale, window().getHeight()); // Right
+        window().fillRect(0, 0, window().getWidth(), baseY - scale);
+        window().fillRect(0, baseY + scale, window().getWidth(), window().getHeight() - baseY - scale);
+    }
+
+    void PlotterGUI::createGraphicsLines() {
+        /* Add new lines to the end of the list. */
+        for (size_t i = displayLines.size(); i < rawLines.size(); i++) {
+            Line curr = rawLines[i];
+
+            /* TODO: Once C++14 support is everywhere, use make_unique. */
+            unique_ptr<GLine> line(new GLine(curr.x0 * scale + baseX, -curr.y0 * scale + baseY,
+                                             curr.x1 * scale + baseX, -curr.y1 * scale + baseY));
+            line->setColor(curr.style.color);
+            line->setLineWidth(curr.style.width);
+            displayLines.push_back(move(line));
+        }
     }
 
     void PlotterGUI::actionPerformed(GObservable* obj) {
@@ -169,14 +195,23 @@ namespace {
             if (toLoad != kNotSelected) {
                 clearGraphics();
 
-                ifstream input(toLoad);
+                ifstream input("res/" + toLoad);
                 runPlotterScript(input);
             }
         }
     }
 
     void PlotterGUI::clearGraphics() {
-        lines.clear();
+        displayLines.clear();
+        rawLines.clear();
+        requestRepaint();
+    }
+
+    void PlotterGUI::windowResized() {
+        /* Wipe all previously-displayed lines; they have the wrong position. */
+        displayLines.clear();
+
+        calculateGeometry();
         requestRepaint();
     }
 }

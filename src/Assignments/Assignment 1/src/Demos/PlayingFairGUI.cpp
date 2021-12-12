@@ -1,6 +1,5 @@
-#include "PlayingFairGUI.h"
-#include "PlayingFair.h"
-#include "TemporaryComponent.h"
+#include "../PlayingFair.h"
+#include "../GUI/MiniGUI.h"
 #include "ginteractors.h"
 using namespace std;
 
@@ -50,11 +49,11 @@ namespace {
 
         /* Expand our box around the spots used in the fractal. */
         for (const auto& loc: points) {
-            minX = min(minX, loc.getX());
-            minY = min(minY, loc.getY());
+            minX = min(minX, loc.x);
+            minY = min(minY, loc.y);
 
-            maxX = max(maxX, loc.getX());
-            maxY = max(maxY, loc.getY());
+            maxX = max(maxX, loc.x);
+            maxY = max(maxY, loc.y);
         }
 
         /* Nudge everything ever so slightly to avoid degenerate cases. */
@@ -102,8 +101,8 @@ namespace {
         for (char ch: aSequenceOfOrder(n)) {
             if (ch == 'A') {
                 loc = {
-                    loc.getX() + cos(theta),
-                    loc.getY() + sin(theta)
+                    loc.x + cos(theta),
+                    loc.y + sin(theta)
                 };
 
                 result += loc;
@@ -132,11 +131,11 @@ namespace {
         line.setLineWidth(kLineWidth);
 
         for (int i = 0; i + 1 < points.size(); i++) {
-            double x0 = g.baseX + (points[i].getX() - g.minX) * g.scale;
-            double y0 = g.baseY + (points[i].getY() - g.minY) * g.scale;
+            double x0 = g.baseX + (points[i].x - g.minX) * g.scale;
+            double y0 = g.baseY + (points[i].y - g.minY) * g.scale;
 
-            double x1 = g.baseX + (points[i+1].getX() - g.minX) * g.scale;
-            double y1 = g.baseY + (points[i+1].getY() - g.minY) * g.scale;
+            double x1 = g.baseX + (points[i+1].x - g.minX) * g.scale;
+            double y1 = g.baseY + (points[i+1].y - g.minY) * g.scale;
 
             line.setStartPoint(x0, y0);
             line.setEndPoint(x1, y1);
@@ -150,39 +149,44 @@ namespace {
         label.setLocation(kWindowPadding, window.getCanvasHeight() - label.getFontDescent() - kWindowPadding);
         window.draw(label);
     }
-}
 
-struct PlayingFairGUI::Impl {
-    Temporary<GSlider> order;
+    class PlayingFairGUI: public ProblemHandler {
+    public:
+        PlayingFairGUI(GWindow& window);
+        void changeOccurredIn(GObservable* source) override;
 
-    int lastOrder = kDefaultOrder;
-};
+    protected:
+        void repaint() override;
 
-PlayingFairGUI::PlayingFairGUI(GWindow& window) {
-    mImpl = make_shared<Impl>();
+    private:
+        Temporary<GSlider> order;
+        int lastOrder = kDefaultOrder;
+    };
 
-    auto* slider = new GSlider(kMinOrder, kMaxOrder, kDefaultOrder);
-    slider->setPaintLabels(true);
-    slider->setPaintTicks(true);
-    slider->setSnapToTicks(true);
-    slider->setMajorTickSpacing(1);
-    slider->setBounds(0, 0, window.getCanvasWidth(), slider->getHeight());
+    PlayingFairGUI::PlayingFairGUI(GWindow& window) : ProblemHandler(window) {
+        auto* slider = new GSlider(kMinOrder, kMaxOrder, kDefaultOrder);
+        slider->setPaintLabels(true);
+        slider->setPaintTicks(true);
+        slider->setSnapToTicks(true);
+        slider->setMajorTickSpacing(1);
+        slider->setBounds(0, 0, window.getCanvasWidth(), slider->getHeight());
 
-    mImpl->order = Temporary<GSlider>(slider, window, "SOUTH");
-}
+        order = Temporary<GSlider>(slider, window, "SOUTH");
+    }
 
-void PlayingFairGUI::changeOccurredIn(GObservable* source) {
-    if (source == mImpl->order) {
-        int currOrder = mImpl->order->getValue();
-        if (currOrder != mImpl->lastOrder) {
-            mImpl->lastOrder = currOrder;
-            requestRepaint();
+    void PlayingFairGUI::changeOccurredIn(GObservable* source) {
+        if (source == order) {
+            int currOrder = order->getValue();
+            if (currOrder != lastOrder) {
+                lastOrder = currOrder;
+                requestRepaint();
+            }
         }
     }
-}
 
-void PlayingFairGUI::repaint(GWindow& window) {
-    drawFractal(mImpl->lastOrder, window);
+    void PlayingFairGUI::repaint() {
+        drawFractal(lastOrder, window());
+    }
 }
 
 shared_ptr<ProblemHandler> makePlayingFairGUI(GWindow& window) {

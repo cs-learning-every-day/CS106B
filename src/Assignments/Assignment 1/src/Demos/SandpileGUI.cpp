@@ -1,6 +1,5 @@
-#include "Demos/SandpileGUI.h"
-#include "Demos/TemporaryComponent.h"
-#include "Sandpiles.h"
+#include "../GUI/MiniGUI.h"
+#include "../Sandpiles.h"
 #include "grid.h"
 #include "gwindow.h"
 #include "hashmap.h"
@@ -38,11 +37,6 @@ namespace {
 
     /* Maximum cell size. */
     const double kMaxCellSize = 10;
-
-    /* Timer threshold. Higher values mean that we have more tolerance for slow draws.
-     * Lower values mean that we have less tolerance for slow draws.
-     */
-    const double kTimerThreshold = 0.75;
 
     /* World sizes. */
     const vector<string> kSizeClasses = {
@@ -155,71 +149,80 @@ namespace {
         label.setLocation(0, window.getCanvasHeight() - label.getFontDescent());
         window.draw(&label);
     }
-}
 
-struct SandpileGUI::Impl {
-    /* Current state of the world. */
-    Grid<int> world;
+    /* Problem handler for visualizing a growing sandpile. */
+    class SandpileGUI: public ProblemHandler {
+    public:
+        SandpileGUI(GWindow& window);
+        void actionPerformed(GObservable* source) override;
+        void timerFired() override;
 
-    /* Timer to drive things. */
-    unique_ptr<GTimer> timer;
+    protected:
+        void repaint() override;
 
-    /* Buttons to control the world size. */
-    Temporary<GLabel> sizeLabel;
-    vector<Temporary<GButton>> sizeButtons;
+    private:
+        /* Current state of the world. */
+        Grid<int> world;
 
-    /* Slider to control speed. */
-    Temporary<GLabel> speedLabel;
-    Temporary<GSlider> speedControl;
+        /* Timer to drive things. */
+        unique_ptr<GTimer> timer;
 
-    /* How many grains of sand we've dropped. */
-    int grainsDropped = 0;
-};
+        /* Buttons to control the world size. */
+        Temporary<GLabel> sizeLabel;
+        vector<Temporary<GButton>> sizeButtons;
 
-SandpileGUI::SandpileGUI(GWindow& window) {
-    mImpl = make_shared<Impl>();
-    mImpl->world.resize(kSizes["Medium"].first, kSizes["Medium"].second);
+        /* Slider to control speed. */
+        Temporary<GLabel> speedLabel;
+        Temporary<GSlider> speedControl;
 
-    /* Size buttons. */
-    mImpl->sizeLabel = Temporary<GLabel>(new GLabel("World Size: "), window, "SOUTH");
-    for (const auto& size: kSizeClasses) {
-        mImpl->sizeButtons.emplace_back(new GButton(size), window, "SOUTH");
+        /* How many grains of sand we've dropped. */
+        int grainsDropped = 0;
+    };
+
+    SandpileGUI::SandpileGUI(GWindow& window) : ProblemHandler(window) {
+        world.resize(kSizes["Medium"].first, kSizes["Medium"].second);
+
+        /* Size buttons. */
+        sizeLabel = Temporary<GLabel>(new GLabel("World Size: "), window, "SOUTH");
+        for (const auto& size: kSizeClasses) {
+            sizeButtons.emplace_back(new GButton(size), window, "SOUTH");
+        }
+
+        /* Speed control. */
+        speedLabel = Temporary<GLabel>(new GLabel("Drop rate: "), window, "SOUTH");
+        GSlider* slider = new GSlider(0, kAdvanceRates.size() - 1, 0);
+        slider->setPaintTicks(true);
+        speedControl = Temporary<GSlider>(slider, window, "SOUTH");
+
+        timer.reset(new GTimer(kPauseTime));
+        timer->start();
     }
 
-    /* Speed control. */
-    mImpl->speedLabel = Temporary<GLabel>(new GLabel("Drop rate: "), window, "SOUTH");
-    GSlider* slider = new GSlider(0, kAdvanceRates.size() - 1, 0);
-    slider->setPaintTicks(true);
-    mImpl->speedControl = Temporary<GSlider>(slider, window, "SOUTH");
+    void SandpileGUI::repaint() {
+        drawWorld(world, window());
+        drawLegend(grainsDropped, window());
+    }
 
-    mImpl->timer.reset(new GTimer(kPauseTime));
-    mImpl->timer->start();
-}
+    void SandpileGUI::actionPerformed(GObservable* source) {
+        /* If the source is one of our buttons, change the world size. */
+        auto itr = find(sizeButtons.begin(), sizeButtons.end(), source);
+        if (itr != sizeButtons.end()) {
+            auto size = kSizes[(*itr)->getText()];
+            world.resize(size.first, size.second);
+            world.fill(0);
+            grainsDropped = 0;
+            requestRepaint();
+        }
+    }
 
-void SandpileGUI::repaint(GWindow& window) {
-    drawWorld(mImpl->world, window);
-    drawLegend(mImpl->grainsDropped, window);
-}
-
-void SandpileGUI::actionPerformed(GObservable* source) {
-    /* If the source is one of our buttons, change the world size. */
-    auto itr = find(mImpl->sizeButtons.begin(), mImpl->sizeButtons.end(), source);
-    if (itr != mImpl->sizeButtons.end()) {
-        auto size = kSizes[(*itr)->getText()];
-        mImpl->world.resize(size.first, size.second);
-        mImpl->world.fill(0);
-        mImpl->grainsDropped = 0;
+    void SandpileGUI::timerFired() {
+        int numSteps = kAdvanceRates[speedControl->getValue()];
+        for (int i = 0; i < numSteps; i++) {
+            dropSandOn(world, world.numRows() / 2, world.numCols() / 2);
+            ++grainsDropped;
+        }
         requestRepaint();
     }
-}
-
-void SandpileGUI::timerFired() {
-    int numSteps = kAdvanceRates[mImpl->speedControl->getValue()];
-    for (int i = 0; i < numSteps; i++) {
-        dropSandOn(mImpl->world, mImpl->world.numRows() / 2, mImpl->world.numCols() / 2);
-        ++mImpl->grainsDropped;
-    }
-    requestRepaint();
 }
 
 shared_ptr<ProblemHandler> makeSandpilesGUI(GWindow& window) {

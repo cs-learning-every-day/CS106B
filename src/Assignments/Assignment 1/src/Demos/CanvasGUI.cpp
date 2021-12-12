@@ -1,7 +1,7 @@
-#include "ProblemHandler.h"
-#include "Plotter.h"
-#include "TemporaryComponent.h"
-#include "GUIUtils.h"
+#include "../Plotter.h"
+#include "../GUI/ProblemHandler.h"
+#include "../GUI/TemporaryComponent.h"
+#include "../GUI/GUIUtils.h"
 #include "gobjects.h"
 #include "error.h"
 #include "filelib.h"
@@ -31,7 +31,7 @@ namespace {
         void mouseDragged(double x, double y) override;
 
     protected:
-        void repaint(GWindow& window) override;
+        void repaint() override;
 
     private:
         void addLine(double x, double y, double width, double height, PenStyle style);
@@ -54,14 +54,14 @@ namespace {
         Temporary<GTextField> mWidth;
 
         /* Initialization helpers. */
-        void calculateGeometry(GWindow& window);
-        void setUpChrome(GWindow& window);
+        void calculateGeometry();
+        void setUpChrome();
     };
 
     /* Constructor sets up graphics and hooks us in as the One True GUI. */
-    PlotterGUI::PlotterGUI(GWindow& window) {
-        setUpChrome(window);
-        calculateGeometry(window);
+    PlotterGUI::PlotterGUI(GWindow& window) : ProblemHandler(window) {
+        setUpChrome();
+        calculateGeometry();
     }
 
     /* Hook from the global graphics system to drawing a line. */
@@ -77,10 +77,10 @@ namespace {
     }
 
     /* Calculates window geometry information - scale, base X, base Y, etc. */
-    void PlotterGUI::calculateGeometry(GWindow& window) {
+    void PlotterGUI::calculateGeometry() {
         /* Computing the scaling factors needed to scale to the window width and window height. */
-        double width  = window.getCanvasWidth()  - 2 * kPadding;
-        double height = window.getCanvasHeight() - 2 * kPadding;
+        double width  = window().getCanvasWidth()  - 2 * kPadding;
+        double height = window().getCanvasHeight() - 2 * kPadding;
 
         scale = min(width, height) / 2.0;
 
@@ -90,29 +90,29 @@ namespace {
     }
 
     /* Sets up window controls ("chrome"). */
-    void PlotterGUI::setUpChrome(GWindow& window) {
-        mFilename = Temporary<GTextField>(new GTextField("(filename)"), window, "SOUTH");
-        mSave     = Temporary<GButton>(new GButton("Save"), window, "SOUTH");
-        mColor    = Temporary<GTextField>(new GTextField("black"), window, "SOUTH");
-        mWidth    = Temporary<GTextField>(new GTextField("1"), window, "SOUTH");
+    void PlotterGUI::setUpChrome() {
+        mFilename = Temporary<GTextField>(new GTextField("(filename)"), window(), "SOUTH");
+        mSave     = Temporary<GButton>(new GButton("Save"), window(), "SOUTH");
+        mColor    = Temporary<GTextField>(new GTextField("black"), window(), "SOUTH");
+        mWidth    = Temporary<GTextField>(new GTextField("1"), window(), "SOUTH");
     }
 
-    void PlotterGUI::repaint(GWindow& window) {
+    void PlotterGUI::repaint() {
         /* We have to draw the border on top of the lines in case the plotter
          * goes out of bounds!
          */
-        clearDisplay(window, kCanvasColor);
+        clearDisplay(window(), kCanvasColor);
 
         for (const auto& line: lines) {
-            window.draw(*line);
+            window().draw(*line);
         }
 
         /* Draw above, to the left of, to the right of, and below the canvas. */
-        window.setColor(kWindowColor);
-        window.fillRect(0, 0, baseX - scale, window.getHeight()); // Left
-        window.fillRect(baseX + scale, 0, window.getWidth() - baseX - scale, window.getHeight()); // Right
-        window.fillRect(0, 0, window.getWidth(), baseY - scale);
-        window.fillRect(0, baseY + scale, window.getWidth(), window.getHeight() - baseY - scale);
+        window().setColor(kWindowColor);
+        window().fillRect(0, 0, baseX - scale, window().getHeight()); // Left
+        window().fillRect(baseX + scale, 0, window().getWidth() - baseX - scale, window().getHeight()); // Right
+        window().fillRect(0, 0, window().getWidth(), baseY - scale);
+        window().fillRect(0, baseY + scale, window().getWidth(), window().getHeight() - baseY - scale);
     }
 
     void PlotterGUI::actionPerformed(GObservable* obj) {

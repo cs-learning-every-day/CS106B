@@ -3,72 +3,24 @@
  * TODO: Edit these comments to describe anything interesting or noteworthy in your implementation.
  */
 #include "Sandpiles.h"
-#include "Testing/SandpileTests.h"
+#include "GUI/SimpleTest.h"
 using namespace std;
 
 void dropSandOn(Grid<int>& world, int row, int col) {
     /* TODO: Delete this line and the three after it, then implement this function. */
-    if(++world[row][col]<4)
-        return;
-    world[row][col]=0;
-    if(world.inBounds(row,col-1))
-        dropSandOn(world,row,col-1);
-    if(world.inBounds(row,col+1))
-        dropSandOn(world,row,col+1);
-    if(world.inBounds(row-1,col))
-        dropSandOn(world,row-1,col);
-    if(world.inBounds(row+1,col))
-        dropSandOn(world,row+1,col);
-////    basecase
-//    auto complete=true;
-//    for(int i=0;i<world.numRows();++i){
-//        for(int j=0;j<world.numCols();++j){
-//            if(world[i][j]>3){
-//                complete=false;
-//            }
-//        }
-//    }
-//    if(complete) return;
-//    recursive case
-//    for(int i=0;i<world.numRows();++i){
-//        for(int j=0;j<world.numCols();++j){
-//            if(world[i][j]==4){
-//                for(int r=i-1;r<=i+1;++r){
-//                    for(int c=j-1;c<=j+1;++c){
-//                        if(world.inBounds(r,c)) world[r][c]++;
-//                    }
-//                }
-//                world[i][j]=0;
-//            }
-//        }
-//    }
-
-
+    (void) world;
+    (void) row;
+    (void) col;
 }
 
 
 
 
 
-/* * * * * * Tests Below This Point * * * * * */
 
-ADD_TEST("full case topple work.") {
-    /* Create a simple source grid. */
-    Grid<int> before = {
-        { 0, 0, 0 },
-        { 0, 0, 0 },
-        { 0, 0, 0 },
-    };
-    Grid<int> after = {
-        { 0, 1, 0 },
-        { 0, 0, 0 },
-        { 0, 0, 0 }
-    };
+/* * * * * * Provided Test Cases * * * * * */
 
-    dropSandOn(before, 0, 1);
-    EXPECT_EQUAL(before, after); // The above call changes 'before.'
-}
-ADD_TEST("Dropping into an empty cell only changes that cell.") {
+PROVIDED_TEST("Dropping into an empty cell only changes that cell.") {
     /* Create a simple source grid. */
     Grid<int> before = {
         { 3, 3, 3 },
@@ -85,7 +37,7 @@ ADD_TEST("Dropping into an empty cell only changes that cell.") {
     EXPECT_EQUAL(before, after); // The above call changes 'before.'
 }
 
-ADD_TEST("Non-chaining topples work.") {
+PROVIDED_TEST("Non-chaining topples work.") {
     /* Create a simple source grid. */
     Grid<int> before = {
         { 0, 0, 0 },
@@ -102,7 +54,7 @@ ADD_TEST("Non-chaining topples work.") {
     EXPECT_EQUAL(before, after); // The above call changes 'before.'
 }
 
-ADD_TEST("Two topples chain.") {
+PROVIDED_TEST("Two topples chain.") {
     /* Create a simple source grid. */
     Grid<int> before = {
         { 0, 0, 0, 0 },
@@ -133,3 +85,13 @@ ADD_TEST("Two topples chain.") {
  *
  * Happy testing!
  */
+
+
+
+
+
+
+
+
+
+
