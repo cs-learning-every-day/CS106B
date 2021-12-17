@@ -6,15 +6,37 @@
  */
 #include "OnlyConnect.h"
 #include "Testing/OnlyConnectTests.h"
+#include "strlib.h"
+#include <cctype>
+
 
 using namespace std;
 
+const string CONSONANTS = "aeiou";
+
+bool isConsonant(char c) {
+    if (!isalpha(c)) return true;
+
+    c = toLowerCase(c);
+    if (CONSONANTS.find(c) == string::npos) {
+        return false;
+    }
+    return true;
+}
+
 string onlyConnectize(string phrase) {
-    /* TODO: The next few lines just exist to make sure you don't get compiler warning messages
+    /* The next few lines just exist to make sure you don't get compiler warning messages
      * when this function isn't implemented. Delete these lines, then implement this function.
      */
-    (void) phrase;
-    return "";
+    if (phrase == "" || phrase.size() == 0) {
+        return "";
+    }
+
+    if (isConsonant(phrase[0])) {
+        return onlyConnectize(phrase.substr(1));
+    }
+
+    return charToString(toUpperCase(phrase[0])) + onlyConnectize(phrase.substr(1));
 }
 
 
@@ -35,9 +57,9 @@ ADD_TEST("Handles single-character inputs.") {
     EXPECT_EQUAL(onlyConnectize("+"), "");
     EXPECT_EQUAL(onlyConnectize("Q"), "Q");
 }
-ADD_TEST("my own extreme test.") {
-    EXPECT_EQUAL(onlyConnectize(""), "");
-    EXPECT_EQUAL(onlyConnectize("989237482789748278478787482974cnhw iowhuhds*&*^&*%^&%^"), "CNHWWHHDS");
+
+ADD_TEST("Big Test.") {
+    EXPECT_EQUAL(onlyConnectize("123123123123213123ae3414134341431321i123123123o123123124124123123u123123123123a123123123u"), "");
 }
 /* TODO: You will need to add your own tests into this suite of test cases. Think about the sorts
  * of inputs we tested here, and, importantly, what sorts of inputs we *didn't* test here. Some
