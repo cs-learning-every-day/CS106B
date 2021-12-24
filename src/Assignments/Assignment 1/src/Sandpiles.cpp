@@ -6,18 +6,42 @@
 #include "Testing/SandpileTests.h"
 using namespace std;
 
+void topple(Grid<int>& world, int row, int col) {
+    if (world[row][col] != 4) {
+        return;
+    }
+    world[row][col] = 0;
+    dropSandOn(world, row, col - 1);
+    dropSandOn(world, row, col + 1);
+    dropSandOn(world, row + 1, col);
+    dropSandOn(world, row - 1, col);
+}
+
 void dropSandOn(Grid<int>& world, int row, int col) {
-    /* TODO: Delete this line and the three after it, then implement this function. */
-    (void) world;
-    (void) row;
-    (void) col;
+    if (!world.inBounds(row, col)) {
+        return;
+    }
+    world[row][col]++;
+    topple(world, row, col);
 }
 
 
 
-
-
 /* * * * * * Tests Below This Point * * * * * */
+ADD_TEST("My Test.") {
+    Grid<int> before = {
+        {3, 3, 2},
+        {2, 3, 3},
+        {0, 2, 3}
+    };
+    Grid<int> after = {
+        {1, 3, 0},
+        {1, 0, 3},
+        {2, 1, 1}
+    };
+    dropSandOn(before, 1, 1);
+    EXPECT_EQUAL(before, after);
+}
 
 ADD_TEST("Dropping into an empty cell only changes that cell.") {
     /* Create a simple source grid. */
