@@ -31,6 +31,8 @@ void runPlotterScript(istream& input) {
                     y1 = y0 + stringToReal(tmps[2]);
                 }
                 drawLine(x0, y0, x1, y1, ps);
+                x0 = x1;
+                y0 = y1;
             } else {
                 if (tmps[0] == "moveabs") {
                     x0 = stringToReal(tmps[1]);
