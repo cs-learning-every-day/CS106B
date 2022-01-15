@@ -5,7 +5,7 @@
 ##### Timeline
 
 - [X] Welcome to CS106B!
-- [ ] C++ fundamentals
+- [X] C++ fundamentals
 - [X] Welcome Cpp
 - [ ] Fun with Collections
 - [ ] Recursion
