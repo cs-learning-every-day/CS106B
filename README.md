@@ -7,7 +7,7 @@
 - [X] Welcome to CS106B!
 - [X] C++ fundamentals
 - [X] Welcome Cpp
-- [ ] Fun with Collections
+- [X] Fun with Collections
 - [ ] Recursion
 - [ ] Recursion to the Rescue
 - [ ] Data Sagas
