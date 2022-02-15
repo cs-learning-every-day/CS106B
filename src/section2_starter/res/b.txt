@@ -1,0 +1,15 @@
+Raise your hands if you ever heard about Data Science! It has been the buzz word in the recent past. This field can retain and stay in the marketplace for a long time and provide numerous opportunities to people who add value by utilizing data. I strongly believe Data science is the place to be going forward in the next couple of years or even decades.
+Firstly, What is Data Science?
+Data science is a field that uses algorithms, processes, and models to extract knowledge and generate insights from data. To know more about Data Science, you can read my previous article here.
+There’s lots of data in the world. And ultimately, data is the resource that our scientists work with. If there is more data, there’s more work, and if there’s less data, there’s less work. Let’s jump straight into it. Since the dawn of time up until 2005, humans had used 130 exabytes of data. Well, this tells us absolutely nothing.
+What is an Exabyte? Why is this impressive?
+Well, let’s start from the ground up. Let’s start with one byte here we’ve got the letter A. It takes up exactly one byte of space.
+Now, assume we have a page of letters. Each page of letters can have between two thousand to five thousand letters. So we’ll say that half a page of text is about right for one kilobyte.
+Let us zoom out a thousand times, and you’ll get a book. So a book of about 500 pages that’ll take up about a megabyte.
+Now, let’s zoom out another thousand times. And what we’ll get is a gigabyte, and a gigabyte is sufficient to fit the whole human genome. So a human genome, once it is coded (in an ideal world) can fit into a gigabyte.
+So you can fit an entire person onto a gigabyte if you think of it that way. But here you can counter-argument by telling that the genome of a person is not sufficient to tell you everything about that person. A person has life experiences. Different people live their lives differently. And there’s lots more to a person than just a genome.
+Well then, let’s zoom out another thousand times, and we’ll get to a terabyte. If you take an HD camera and you follow a person for every single day of their life for every single hour, minute, and second and you film everything that they’re doing for 70 or 80 years, you can fit all of that material onto one terabyte.
+Consider the Amazon rain forest that takes up about 1.4 billion acres. That’s 1.4 billion acres of trees. There are about 500 trees per acre, making it about 700 billion trees(Estimated). Now, if you take all of these trees and you chop them down, and you turn them into paper, and you fill that paper with letters entirely on both sides of the sheet, then that will amount to approximately some petabytes of data.
+Well now, if you zoom out another thousand times, you will get an exabyte, and an Exabyte is a thousand petabytes.
+I guess you got an idea of the abundance of data we have used.
+Wait! I mentioned 130 exabytes until 2005 only. What about today? How much data have we consumed until today?
