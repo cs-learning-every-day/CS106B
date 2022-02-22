@@ -17,6 +17,27 @@
 #include "map.h"
 using namespace std;
 
+void help(const Map<string, Set<string>> prereqs,
+          Vector<string>& cur,
+          Set<string>& tasks) {
+    if (tasks.isEmpty()) {
+        cout << cur << endl;
+        return;
+    }
+
+    Set<string> s;
+    for (string t : cur) s.add(t);
+
+    for (string task : tasks) {
+        if (prereqs[task].isSubsetOf(s)) {
+            cur.add(task);
+            auto tmp = tasks - task;
+            help(prereqs, cur, tmp);
+            cur.remove(cur.size() - 1);
+        }
+    }
+}
+
 /*
  * Function: listLegalOrderingsOf
  * -------------------------------
@@ -28,7 +49,14 @@ using namespace std;
  * See section handout for more details
  */
 void listLegalOrderingsOf(const Map<string, Set<string>>& prereqs) {
-    (void) prereqs;
+    Set<string> tasks;
+    Vector<string> cur;
+
+    for (string k : prereqs) {
+        tasks.add(k);
+    }
+
+    help(prereqs, cur, tasks);
     return;
 }
 

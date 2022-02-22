@@ -15,7 +15,23 @@
 #include "testing/TextUtils.h"
 #include "set.h"
 #include "error.h"
+#include "map.h"
 using namespace std;
+
+
+void dfs(int total, const Set<string>& people,
+                    Map<string, int>& map) {
+    if (people.size() == 1) {
+        map[people.first()] = total;
+        cout << map << endl;
+    } else {
+        for (int t = 0; t <= total; t++) {
+            map[people.first()] = t;
+            dfs(total - t, people - people.first(), map);
+            map[people.first()] = 0;
+        }
+    }
+}
 
 /*
  * Function: listPossiblePayments
@@ -26,10 +42,19 @@ using namespace std;
  * the bill, assuming everyone pays a whole number of dollars.
  */
 void listPossiblePayments(int total, const Set<string>& people) {
-    (void) total;
-    (void) people;
+    if (total < 0) {
+        error("total must be not negative!");
+    }
+
+    if (people.size() < 1) {
+        error("must be at least one person!");
+    }
+
+    Map<string, int> map;
+    dfs(total, people, map);
     return;
 }
+
 
 /* * * * * Provided Tests Below This Point * * * * */
 

@@ -17,6 +17,23 @@
 #include "set.h"
 using namespace std;
 
+
+int help(int cents, const Set<int>& coins, Map<int, int>& map) {
+    if (cents == 0) {
+        return 0;
+    }
+    if (map.containsKey(cents)) {
+        return map[cents];
+    }
+
+    int result = cents;
+    for (int coin : coins) {
+        if (cents < coin) break;
+        result = min(result, 1 + help(cents - coin, coins, map));
+    }
+    map[cents] = result;
+    return result;
+}
 /*
  * Function: fewestCoinsFor
  * -------------------------
@@ -28,9 +45,8 @@ using namespace std;
  * a lot fewer!
  */
 int fewestCoinsFor(int cents, const Set<int>& coins) {
-  (void) cents;
-  (void) coins;
-  return 0;
+    Map<int, int> map;
+    return help(cents, coins, map);
 }
 
 /* * * * * Provided Tests Below This Point * * * * */
@@ -39,5 +55,5 @@ PROVIDED_TEST("Provided Test: Verify that the solution works on a simple example
     Set<int> coins = {50, 25, 10, 5, 1};
     EXPECT_EQUAL(fewestCoinsFor(12, coins), 3);
     // You might want to uncomment this after implementing memoization.
-    // EXPECT_EQUAL(fewestCoinsFor(97, coins), 6);
+    EXPECT_EQUAL(fewestCoinsFor(97, coins), 6);
 }

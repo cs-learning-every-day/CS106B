@@ -20,4 +20,4 @@
 
 - [x] C++ fundamentals
 - [x] Containers
-- [ ] Recursion Etudes
+- [x] Recursion Etudes
