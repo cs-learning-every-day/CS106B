@@ -21,3 +21,6 @@
 - [x] C++ fundamentals
 - [x] Containers
 - [x] Recursion Etudes
+- [ ] Recursive Backtracking
+- [ ] Class Design and Dynamic Memory Allocation
+- [ ] Class Design and Hashing
