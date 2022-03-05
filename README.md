@@ -9,7 +9,7 @@
 - [X] Welcome to CS106B!
 - [X] Welcome Cpp
 - [X] Fun with Collections
-- [ ] Recursion
+- [x] Recursion
 - [ ] Recursion to the Rescue
 - [ ] Data Sagas
 - [ ] The Great Stanford Hash Off

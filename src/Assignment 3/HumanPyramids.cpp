@@ -1,40 +1,61 @@
 #include "HumanPyramids.h"
+#include "error.h"
+#include "unordered_map"
 using namespace std;
 
-/* TODO: Refer to HumanPyramids.h for more information about what this function should do.
- * Then, delete this comment.
- */
-double weightOnBackOf(int row, int col, int pyramidHeight) {
-    /* TODO: Delete the next few lines and implement this function. */
-    (void) row;
-    (void) col;
-    (void) pyramidHeight;
-    return 0;
+struct hash_pair {
+    template <class T1, class T2>
+    size_t operator()(const pair<T1, T2>& p) const {
+        auto hash1 = hash<T1>{}(p.first);
+        auto hash2 = hash<T2>{}(p.second);
+        return hash1 ^ hash2;
+    }
+};
+
+double _help(int row, int col, unordered_map<pair<int, int>, double, hash_pair>& table) {
+    if (row < 0 || col < 0 || col > row) {
+        return -1;
+    }
+    if (row == 0 && col == 0) {
+        return 0;
+    }
+    pair<int, int> cord = {row, col};
+    if (table.count(cord)) {
+        return table[cord];
+    }
+    double res = 0;
+    double t = _help(row - 1, col, table);
+    if (t != -1) {
+        res += 80 + t / 2;
+    }
+    t = _help(row - 1, col - 1, table);
+    if (t != -1) {
+        res += 80 + t / 2;
+    }
+    table[cord] = res;
+    return res;
 }
 
-
-
-
+double weightOnBackOf(int row, int col, int pyramidHeight) {
+    if (row < 0 || col < 0 ||
+            row >= pyramidHeight ||
+            col > row) {
+        error("Invalid Argument.");
+    }
+    unordered_map<pair<int, int>, double, hash_pair> table;
+    return _help(row, col, table);
+}
 
 
 /* * * * * * Test Cases * * * * * */
 #include "GUI/SimpleTest.h"
 
-/* TODO: Add your own tests here. You know the drill - look for edge cases, think about
- * very small and very large cases, etc.
- */
-
-
-
-
-
-
-
-
-
-
-
-
+STUDENT_TEST("My Test") {
+    EXPECT_EQUAL(weightOnBackOf(2, 0, 5), 120);
+    EXPECT_EQUAL(weightOnBackOf(3, 0, 5), 140);
+    EXPECT_EQUAL(weightOnBackOf(3, 1, 5), 340);
+    EXPECT_EQUAL(weightOnBackOf(4, 2, 5), 500);
+}
 
 
 /* * * * * * Test cases from the starter files below this point. * * * * * */
@@ -55,7 +76,7 @@ PROVIDED_TEST("Stress test: Memoization is implemented (should take under a seco
      * line immediately after this one - the one that starts with SHOW_ERROR - once
      * you have implemented memoization to test whether it works correctly.
      */
-    SHOW_ERROR("This test is configured to always fail until you delete this line from\n         HumanPyramids.cpp. Once you have implemented memoization and want\n         to check whether it works correctly, remove the indicated line.");
+//    SHOW_ERROR("This test is configured to always fail until you delete this line from\n         HumanPyramids.cpp. Once you have implemented memoization and want\n         to check whether it works correctly, remove the indicated line.");
 
     /* Do not delete anything below this point. :-) */
 

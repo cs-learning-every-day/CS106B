@@ -1,14 +1,53 @@
 #include "ShiftScheduling.h"
 using namespace std;
 
-/* TODO: Refer to ShiftScheduling.h for more information about what this function should do.
- * Then, delete this comment and replace it with one of your own.
- */
+int getValue(const Set<Shift>& s) {
+    int res = 0;
+    for (auto c : s) {
+        res += valueOf(c);
+    }
+    return res;
+}
+
+void dfs(Set<Shift> shifts,
+         Set<Shift>& ans,
+         Set<Shift> cur, int leftHours) {
+    if (leftHours <= 0 || shifts.isEmpty()) {
+        int t = getValue(cur);
+        if (t > getValue(ans)) {
+            ans = cur;
+        }
+        return;
+    }
+
+    auto one = shifts.first();
+
+    bool isOverlaps = false;
+    for (auto tmp : cur) {
+        if (overlapsWith(one, tmp)) {
+            isOverlaps = true;
+            break;
+        }
+    }
+
+    shifts -= one;
+
+    auto nHours = leftHours - lengthOf(one);
+    if (!isOverlaps && nHours >= 0) { // can use
+        cur += one;
+        dfs(shifts, ans, cur, nHours);
+        cur -= one;
+    }
+    dfs(shifts, ans, cur, leftHours);
+}
+
 Set<Shift> highestValueScheduleFor(const Set<Shift>& shifts, int maxHours) {
-    /* TODO: Delete the next few lines and implement this function. */
-    (void) shifts;
-    (void) maxHours;
-    return {};
+    if (maxHours < 0) {
+        error("maxHours should be grater zero!");
+    }
+    Set<Shift> res;
+    dfs(shifts, res, {}, maxHours);
+    return res;
 }
 
 
@@ -16,21 +55,22 @@ Set<Shift> highestValueScheduleFor(const Set<Shift>& shifts, int maxHours) {
 /* * * * * * Test Cases * * * * * */
 #include "GUI/SimpleTest.h"
 
-/* TODO: Add your own tests here. You know the drill - look for edge cases, think about
- * very small and very large cases, etc.
- */
 
+STUDENT_TEST("My test") {
+    Set<Shift> shifts = {
+        { Day::MONDAY, 9, 17, 1000 },  // Monday, 9AM - 5PM, value is 1000
+        { Day::TUESDAY, 8, 10, 220 },
+        { Day::TUESDAY, 12, 17, 320 },
+    };
 
+    Set<Shift> expected = {
+        { Day::MONDAY, 9, 17, 1000 },  // Monday, 9AM - 5PM, value is 1000
+        { Day::TUESDAY, 12, 17, 320 },
+    };
 
-
-
-
-
-
-
-
-
-
+    EXPECT_EQUAL(highestValueScheduleFor(shifts, 13).size(), 2);
+    EXPECT_EQUAL(highestValueScheduleFor(shifts, 13), expected);
+}
 
 
 /* * * * * * Test cases from the starter files below this point. * * * * * */

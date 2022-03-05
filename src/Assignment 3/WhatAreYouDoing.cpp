@@ -1,36 +1,42 @@
 #include "WhatAreYouDoing.h"
+#include "strlib.h"
+#include <cctype>
 using namespace std;
 
-/* TODO: Read the comments in WhatAreYouDoing.h to see what this function needs to do, then
- * delete this comment.
- *
- * Don't forget about the tokenize function defined in WhatAreYouDoing.h; you'll almost
- * certainly want to use it.
- */
+void dfs(Set<string>& ans, Vector<string>& words,
+         string cur, int s) {
+    if (s == words.size()) {
+        ans.add(cur);
+        return;
+    }
+
+    if (isalpha(words[s][0])) {
+        dfs(ans, words, cur + toUpperCase(words[s]), s + 1);
+    }
+    cur += words[s];
+    dfs(ans, words, cur, s + 1);
+}
+
 Set<string> allEmphasesOf(const string& sentence) {
-    /* TODO: Delete this line and the next one, then implement this function. */
-    (void) sentence;
-    return {};
+    Vector<string> words = tokenize(toLowerCase(sentence));
+    Set<string> res;
+    dfs(res, words, "", 0);
+    return res;
 }
 
 /* * * * * * Test Cases * * * * * */
 #include "GUI/SimpleTest.h"
 
-/* TODO: Add your own tests here. You know the drill - look for edge cases, think about
- * very small and very large cases, etc.
- */
+STUDENT_TEST("My test") {
+    Set<string> expected = {
+        " 1 2 \"hello\", test!",
+        " 1 2 \"hello\", TEST!",
+        " 1 2 \"HELLO\", test!",
+        " 1 2 \"HELLO\", TEST!",
+    };
 
-
-
-
-
-
-
-
-
-
-
-
+    EXPECT_EQUAL(allEmphasesOf(" 1 2 \"Hello\", test!"), expected);
+}
 
 
 /* * * * * * Test cases from the starter files below this point. * * * * * */
