@@ -27,10 +27,35 @@ using namespace std;
  * already factored inthe cost of speaking at each site
  * and that you’re just concerned about the travel time.)
  */
+
+double distance(const GPoint &p1, const GPoint &p2) {
+    return sqrt(abs(p1.x - p2.x) + abs(p1.y - p2.y));
+}
+
+bool help(GPoint start, Vector<GPoint> sites, double time) {
+    if (time < 0) {
+        return false;
+    }
+
+    if (time == 0 && sites.size() != 0) {
+        return false;
+    }
+
+    for (int i = 0; i < sites.size(); i++) {
+        auto tmp = sites;
+        tmp.remove(i);
+        help(sites[i], tmp, time - distance(sites[i], start));
+    }
+
+    return true;
+}
+
 bool canVisitAllSites(const Vector<GPoint>& sites, double travelTimeAvailable) {
-    /* todo: remove these lines and implement this function! */
-    (void) sites;
-    (void) travelTimeAvailable;
+    for (auto p : sites) {
+        if (help(p, sites, travelTimeAvailable)) {
+            return true;
+        }
+    }
     return false;
 }
 

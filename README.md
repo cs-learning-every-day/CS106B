@@ -1,6 +1,6 @@
 # CS106B
 
-> 学习[Winter Quarter 2022](https://web.stanford.edu/class/cs106b/)
+> 学习[Winter Quarter 2022](https://web.stanford.edu/class/archive/cs/cs106b/cs106b.1224/schedule.html) [Other Version](https://web.stanford.edu/class/archive/cs/cs106b/cs106b.1214/)
 
 #### Timeline
 
@@ -21,6 +21,6 @@
 - [x] C++ fundamentals
 - [x] Containers
 - [x] Recursion Etudes
-- [ ] Recursive Backtracking
+- [x] Recursive Backtracking
 - [ ] Class Design and Dynamic Memory Allocation
 - [ ] Class Design and Hashing

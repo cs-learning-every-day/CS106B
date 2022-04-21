@@ -24,9 +24,18 @@ using namespace std;
  * given set of weights, which is stored in the vector weights.
  */
 bool isMeasurable(int target, const Vector<int>& weights) {
-    /* todo: remove these lines and implement this function! */
-    (void) target;
-    (void) weights;
+
+    if (target <= 0) {
+        return target == 0;
+    }
+    // 可以写个辅助函数优化以下代码
+    for (int i = 0; i < weights.size(); i++) {
+        auto v = weights.subList(i + 1);
+        if (isMeasurable(target - weights[i], v) ||
+            isMeasurable(target + weights[i], v)) {
+            return true;
+        }
+    }
     return false;
 }
 

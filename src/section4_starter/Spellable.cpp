@@ -15,6 +15,7 @@
 #include "testing/SimpleTest.h"
 #include "testing/TextUtils.h"
 #include "set.h"
+#include "strlib.h"
 using namespace std;
 
 /*
@@ -25,11 +26,29 @@ using namespace std;
  * capitalization), then returns whether that string can be
  * written using only element symbols.
  */
+bool help(string text, const Set<string>& symbols) {
+    if (symbols.contains(text)) {
+        return true;
+    }
+    for (int i = 0; i < text.length() - 1; i++) {
+        string s1 = toUpperCase(text.substr(i, 1));
+        if (symbols.contains(s1) &&
+                help(text.substr(i + 1), symbols)) {
+            return true;
+        }
+
+        string s2 = s1 + text[i + 1];
+        if (symbols.contains(s2) &&
+                (i + 2 >= text.length() ||
+                    help(text.substr(i + 2), symbols))) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool isElementSpellable(const string& text, const Set<string>& symbols) {
-  /* todo: remove these lines and implement this function! */
-  (void) text;
-  (void) symbols;
-  return false;
+    return help(text, symbols);
 }
 
 /* * * * * Provided Tests Below This Point * * * * */
